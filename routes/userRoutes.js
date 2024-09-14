@@ -1,0 +1,48 @@
+import express from "express";
+import { body } from "express-validator";
+import {
+  getUsers,
+  getUserById,
+  createUser,
+  updateUser,
+  deleteUser,
+} from "../controllers/userController.js";
+import { validateToken } from "../middlewares/auth.js"; // Importas el middleware de autenticación
+import { validateRole } from "../middlewares/role.js";
+import { loginUser } from "../controllers/authController.js";
+
+const router = express.Router();
+
+// Rutas CRUD de usuario
+router.get("/", validateToken, validateRole("admin"), getUsers); // Obtener todos los usuarios
+router.get("/:id", getUserById); // Obtener un usuario por ID
+
+// Ruta para crear usuario (POST) con validaciones
+router.post(
+  "/",
+  [
+    body("name").not().isEmpty().withMessage("El nombre es obligatorio"),
+    body("email").isEmail().withMessage("Agrega un email válido"),
+    body("password")
+      .isLength({ min: 6 })
+      .withMessage("El password debe tener al menos 6 caracteres"),
+  ],
+  validateToken, // Solo usuarios autenticados pueden crear usuarios
+  validateRole("admin"), // Solo administradores pueden crear usuarios
+  createUser
+);
+
+router.put("/:id", updateUser); // Actualizar un usuario
+router.delete("/:id", deleteUser); // Eliminar un usuario
+
+// Ruta para login de usuario (POST /login)
+router.post(
+  "/login",
+  [
+    body("email").isEmail().withMessage("Agrega un email válido"),
+    body("password").not().isEmpty().withMessage("El password es obligatorio"),
+  ],
+  loginUser
+);
+
+export default router;

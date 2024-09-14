@@ -1,0 +1,16 @@
+# Ignorar la carpeta node_modules
+node_modules/
+
+# Ignorar archivos de configuración del entorno
+.env
+
+# Ignorar los logs
+logs/
+*.log
+
+# Ignorar archivos temporales del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Ignorar los archivos de dependencias de producción si estás en desarrollo
+package-lock.json
