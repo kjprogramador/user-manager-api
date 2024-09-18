@@ -1,8 +1,15 @@
+import { validationResult } from "express-validator";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { User } from "../models/index.js";
 
 export const loginUser = async (req, res) => {
+  // Verificar si hay errores de validación
+  const errores = validationResult(req);
+  if (!errores.isEmpty()) {
+    return res.status(400).json({ errores: errores.array() });
+  }
+
   const { email, password } = req.body;
 
   try {

@@ -13,15 +13,18 @@ import { loginUser } from "../controllers/authController.js";
 
 const router = express.Router();
 
-// Rutas CRUD de usuario
-router.get("/", validateToken, validateRole("admin"), getUsers); // Obtener todos los usuarios
-router.get("/:id", getUserById); // Obtener un usuario por ID
+// Rutas CRUD
+// Obtener todos los usuarios
+router.get("/", validateToken, validateRole("admin"), getUsers);
+
+// Obtener un usuario por ID
+router.get("/:id", getUserById);
 
 // Ruta para crear usuario (POST) con validaciones
 router.post(
   "/",
   [
-    body("name").not().isEmpty().withMessage("El nombre es obligatorio"),
+    body("name").trim().not().isEmpty().withMessage("El nombre es obligatorio"),
     body("email").isEmail().withMessage("Agrega un email válido"),
     body("password")
       .isLength({ min: 6 })
@@ -32,8 +35,32 @@ router.post(
   createUser
 );
 
-router.put("/:id", updateUser); // Actualizar un usuario
-router.delete("/:id", deleteUser); // Eliminar un usuario
+// Actualizar usuario
+router.put(
+  "/:id",
+  [
+    body("name")
+      .optional()
+      .trim() // Elimina espacios al inicio y al final
+      .not()
+      .isEmpty()
+      .withMessage("El nombre no debe estar vacío"), // no funciona para vacio " " si para ""
+    body("email").optional().isEmail().withMessage("Agrega un email válido"),
+    body("password")
+      .optional()
+      .isLength({ min: 6 })
+      .withMessage("El password debe tener al menos 6 caracteres"),
+    body("role")
+      .optional()
+      .isIn(["admin", "usuario"])
+      .withMessage("El rol debe ser admin o usuario"),
+  ],
+  validateToken,
+  updateUser
+);
+
+// Eliminar un usuario
+router.delete("/:id", deleteUser);
 
 // Ruta para login de usuario (POST /login)
 router.post(
