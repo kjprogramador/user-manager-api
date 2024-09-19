@@ -1,3 +1,4 @@
+import { validationResult } from "express-validator";
 import { User } from "../models/index.js";
 import bcrypt from "bcryptjs";
 
@@ -26,6 +27,12 @@ export const getUserById = async (req, res) => {
 
 // Crear un nuevo usuario
 export const createUser = async (req, res) => {
+  // Verificar si hay errores de validación
+  const errores = validationResult(req);
+  if (!errores.isEmpty()) {
+    return res.status(400).json({ errores: errores.array() });
+  }
+
   const { name, email, password, rol } = req.body;
   try {
     // Verificar si el usuario ya existe
@@ -55,16 +62,32 @@ export const createUser = async (req, res) => {
 
 // Actualizar un usuario existente
 export const updateUser = async (req, res) => {
+  // Verificar si hay errores de validación
+  const errores = validationResult(req);
+  if (!errores.isEmpty()) {
+    return res.status(400).json({ errores: errores.array() });
+  }
+
   const { id } = req.params;
-  const { name, email, password } = req.body;
+  const { name, email, password, role } = req.body;
   try {
     const usuario = await User.findByPk(id);
     if (!usuario)
       return res.status(404).json({ mensaje: "Usuario no encontrado" });
 
-    usuario.name = name;
-    usuario.email = email;
-    usuario.password = password;
+    // Si se incluye un nuevo password, lo encriptamos
+    let hashedPassword;
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      hashedPassword = await bcrypt.hash(password, salt);
+    }
+
+    // Actualizar los campos que hayan sido enviados
+    usuario.name = name || usuario.name;
+    usuario.email = email || usuario.email;
+    usuario.password = hashedPassword || usuario.password;
+    usuario.role = role || usuario.role;
+
     await usuario.save();
 
     res.json(usuario);
