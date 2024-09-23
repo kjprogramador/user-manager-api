@@ -67,7 +67,10 @@ router.post(
   "/login",
   [
     body("email").isEmail().withMessage("Agrega un email válido"),
-    body("password").not().isEmpty().withMessage("El password es obligatorio"),
+    body("password")
+      .trim()
+      .notEmpty()
+      .withMessage("El password es obligatorio"),
   ],
   loginUser
 );

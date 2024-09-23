@@ -7,26 +7,35 @@ export const loginUser = async (req, res) => {
   // Verificar si hay errores de validación
   const errores = validationResult(req);
   if (!errores.isEmpty()) {
-    return res.status(400).json({ errores: errores.array() });
+    return res.status(400).json({
+      error: true,
+      message: "Error en la validación de los datos",
+      details: errores.array(),
+    });
   }
 
   const { email, password } = req.body;
 
   try {
+    // Convertir el email a minúsculas para asegurar la consistencia
+    const emailLowerCase = email.toLowerCase();
+
     // Verificar si el usuario existe
-    let usuario = await User.findOne({ where: { email } });
+    let usuario = await User.findOne({ where: { email: emailLowerCase } });
     if (!usuario) {
-      return res
-        .status(400)
-        .json({ mensaje: "Usuario o contraseña incorrectos" });
+      return res.status(404).json({
+        error: true,
+        message: "El usuario o la contraseña son incorrectos",
+      });
     }
 
     // Verificar la contraseña
     const isMatch = await bcrypt.compare(password, usuario.password);
     if (!isMatch) {
-      return res
-        .status(400)
-        .json({ mensaje: "Usuario o contraseña incorrectos" });
+      return res.status(404).json({
+        error: true,
+        message: "El usuario o la contraseña son incorrectos",
+      });
     }
 
     // Generar token JWT
@@ -35,9 +44,12 @@ export const loginUser = async (req, res) => {
       expiresIn: "1h", // Token expira en 1 hora
     });
 
-    res.json({ token });
+    res.json({ error: false, message: "Inicio de sesión exitoso", token });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ mensaje: "Error en el servidor" });
+    res.status(500).json({
+      error: true,
+      message: "Error en el servidor. Inténtalo más tarde.",
+    });
   }
 };

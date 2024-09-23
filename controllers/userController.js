@@ -6,9 +6,25 @@ import bcrypt from "bcryptjs";
 export const getUsers = async (req, res) => {
   try {
     const usuarios = await User.findAll();
-    res.json(usuarios);
+
+    if (usuarios.length === 0) {
+      return res.status(404).json({
+        error: true,
+        message: "No se encontraron usuarios",
+      });
+    }
+
+    res.json({
+      error: false,
+      message: "Usuarios obtenidos exitosamente",
+      usuarios,
+    });
   } catch (error) {
-    res.status(500).json({ mensaje: "Error al obtener los usuarios" });
+    console.error(error);
+    res.status(500).json({
+      error: true,
+      message: "Error en el servidor. Inténtalo más tarde.",
+    });
   }
 };
 
@@ -17,11 +33,23 @@ export const getUserById = async (req, res) => {
   const { id } = req.params;
   try {
     const usuario = await User.findByPk(id);
+
     if (!usuario)
-      return res.status(404).json({ mensaje: "Usuario no encontrado" });
-    res.json(usuario);
+      return res
+        .status(404)
+        .json({ error: true, message: "Usuario no encontrado" });
+
+    res.json({
+      error: false,
+      message: "Usuario encontrado exitosamente",
+      usuario,
+    });
   } catch (error) {
-    res.status(500).json({ mensaje: "Error al obtener el usuario" });
+    console.error(error);
+    res.status(500).json({
+      error: true,
+      message: "Error en el servidor. Inténtalo más tarde.",
+    });
   }
 };
 
@@ -30,11 +58,18 @@ export const createUser = async (req, res) => {
   // Verificar si hay errores de validación
   const errores = validationResult(req);
   if (!errores.isEmpty()) {
-    return res.status(400).json({ errores: errores.array() });
+    return res.status(400).json({
+      error: true,
+      message: "Error en la validación de los datos",
+      details: errores.array(),
+    });
   }
 
   const { name, email, password, rol } = req.body;
   try {
+    // Convertir el email a minúsculas
+    const emailLowerCase = email.toLowerCase();
+
     // Verificar si el usuario ya existe
     let usuario = await User.findOne({ where: { email } });
     if (usuario) {
@@ -48,15 +83,22 @@ export const createUser = async (req, res) => {
     // Crear nuevo usuario con la contraseña encriptada
     usuario = await User.create({
       name,
-      email,
+      email: emailLowerCase,
       password: hashedPassword,
       rol: rol || "user",
     });
 
-    res.json({ mensaje: "Usuario creado con éxito" });
+    res.status(201).json({
+      error: false,
+      message: "Usuario creado exitosamente",
+      usuario,
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ mensaje: "Error al crear el usuario" });
+    res.status(500).json({
+      error: true,
+      message: "Error en el servidor. Inténtalo más tarde.",
+    });
   }
 };
 
@@ -65,7 +107,11 @@ export const updateUser = async (req, res) => {
   // Verificar si hay errores de validación
   const errores = validationResult(req);
   if (!errores.isEmpty()) {
-    return res.status(400).json({ errores: errores.array() });
+    return res.status(400).json({
+      error: true,
+      message: "Error en la validación de los datos",
+      details: errores.array(),
+    });
   }
 
   const { id } = req.params;
@@ -73,7 +119,9 @@ export const updateUser = async (req, res) => {
   try {
     const usuario = await User.findByPk(id);
     if (!usuario)
-      return res.status(404).json({ mensaje: "Usuario no encontrado" });
+      return res
+        .status(404)
+        .json({ error: true, mensaje: "Usuario no encontrado" });
 
     // Si se incluye un nuevo password, lo encriptamos
     let hashedPassword;
@@ -82,17 +130,28 @@ export const updateUser = async (req, res) => {
       hashedPassword = await bcrypt.hash(password, salt);
     }
 
+    // Convertir email a minúsculas si fue enviado
+    const emailLowerCase = email ? email.toLowerCase() : usuario.email;
+
     // Actualizar los campos que hayan sido enviados
     usuario.name = name || usuario.name;
-    usuario.email = email || usuario.email;
+    usuario.email = emailLowerCase;
     usuario.password = hashedPassword || usuario.password;
     usuario.role = role || usuario.role;
 
     await usuario.save();
 
-    res.json(usuario);
+    res.json({
+      error: false,
+      message: "Usuario actualizado exitosamente",
+      usuario,
+    });
   } catch (error) {
-    res.status(500).json({ mensaje: "Error al actualizar el usuario" });
+    console.error(error);
+    res.status(500).json({
+      error: true,
+      mensaje: "Error en el servidor. Inténtalo más tarde.",
+    });
   }
 };
 
@@ -102,10 +161,19 @@ export const deleteUser = async (req, res) => {
   try {
     const resultado = await User.destroy({ where: { id } });
     if (resultado === 0)
-      return res.status(404).json({ mensaje: "Usuario no encontrado" });
+      return res
+        .status(404)
+        .json({ error: true, message: "Usuario no encontrado" });
 
-    res.status(204).send();
+    res.json({
+      error: false,
+      message: "Usuario eliminado exitosamente",
+    });
   } catch (error) {
-    res.status(500).json({ mensaje: "Error al eliminar el usuario" });
+    console.error(error);
+    res.status(500).json({
+      error: true,
+      message: "Error en el servidor. Inténtalo más tarde.",
+    });
   }
 };
