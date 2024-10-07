@@ -3,6 +3,7 @@ node_modules/
 
 # Ignorar archivos de configuración del entorno
 .env
+.env.test
 
 # Ignorar los logs
 logs/
