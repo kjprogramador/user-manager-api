@@ -5,8 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "cross-env NODE_ENV=test jest --detectOpenHandles",
-    "start": "node index.js"
+    "start": "node index.js",
+    "test": "cross-env NODE_ENV=test jest --detectOpenHandles"
   },
   "author": "Kevin Leon",
   "license": "ISC",
@@ -19,6 +19,10 @@
     "pg": "^8.12.0",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.3"
+  },
+  "engines": {
+    "node": "18.x",
+    "npm": "9.x"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.25.4",
