@@ -20,6 +20,11 @@ sequelize
 app.use("/api/v1/users", userRoutes);
 
 // Iniciar el servidor
-app.listen(port, () => {
-  console.log(`Servidor corriendo en http://localhost:${port}`);
-});
+// Solo iniciar el servidor si no es entorno de prueba
+if (process.env.NODE_ENV !== "test") {
+  app.listen(port, () => {
+    console.log(`Servidor corriendo en http://localhost:${port}`);
+  });
+}
+
+export default app;

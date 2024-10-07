@@ -4,7 +4,7 @@ export const validateToken = (req, res, next) => {
   const authHeader = req.header("Authorization");
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ mensaje: "No hay token, permiso no válido" });
+    return res.status(401).json({ message: "No hay token, permiso no válido" });
   }
 
   // Extraer el token después de "Bearer "

@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 
-dotenv.config(); // Cargar variables de entorno desde .env
+dotenv.config({ path: process.env.NODE_ENV === "test" ? ".env.test" : ".env" }); // Cargar variables de entorno desde .env
 
 export const dbConfig = {
   username: process.env.DB_USER,

@@ -65,7 +65,7 @@ export const createUser = async (req, res) => {
     });
   }
 
-  const { name, email, password, rol } = req.body;
+  const { name, email, password, role } = req.body;
   try {
     // Convertir el email a minúsculas
     const emailLowerCase = email.toLowerCase();
@@ -73,7 +73,7 @@ export const createUser = async (req, res) => {
     // Verificar si el usuario ya existe
     let usuario = await User.findOne({ where: { email } });
     if (usuario) {
-      return res.status(400).json({ mensaje: "El usuario ya existe" });
+      return res.status(400).json({ message: "El usuario ya existe" });
     }
 
     // Encriptar la contraseña
@@ -85,7 +85,7 @@ export const createUser = async (req, res) => {
       name,
       email: emailLowerCase,
       password: hashedPassword,
-      rol: rol || "user",
+      role: role || "user",
     });
 
     res.status(201).json({

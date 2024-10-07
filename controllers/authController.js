@@ -22,6 +22,7 @@ export const loginUser = async (req, res) => {
 
     // Verificar si el usuario existe
     let usuario = await User.findOne({ where: { email: emailLowerCase } });
+
     if (!usuario) {
       return res.status(404).json({
         error: true,
