@@ -9,6 +9,7 @@ if (dbConfig.url) {
   // Conectar usando la URL
   sequelize = new Sequelize(dbConfig.url, {
     dialect: dbConfig.dialect,
+    protocol: dbConfig.dialect,
     dialectOptions: {
       ssl: {
         require: true,
