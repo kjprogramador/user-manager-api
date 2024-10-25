@@ -6,31 +6,17 @@ import bcrypt from "bcryptjs";
 // Obtener todos los usuarios
 export const getUsers = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
+    const { page = 1, limit = 10, role } = req.query;
 
     // Llamar al servicio para obtener los usuarios paginados
-    const result = await getPaginatedUsers(page, limit);
+    const result = await getPaginatedUsers(page, limit, role);
 
-    if (!result.success) {
+    if (!result.data.length === 0) {
+      // ojo aca que sucess ya no existe <<<<<<<<<<<<<<<<<<---------------
       return res.status(404).json(result);
     }
 
     res.status(200).json(result);
-
-    // const usuarios = await User.findAll();
-
-    // if (usuarios.length === 0) {
-    //   return res.status(404).json({
-    //     error: true,
-    //     message: "No se encontraron usuarios",
-    //   });
-    // }
-
-    // res.json({
-    //   error: false,
-    //   message: "Usuarios obtenidos exitosamente",
-    //   usuarios,
-    // });
   } catch (error) {
     console.error(error);
     // res.status(500).json({
@@ -38,7 +24,6 @@ export const getUsers = async (req, res) => {
     //   message: "Error en el servidor. Inténtalo más tarde.",
     // });
     res.status(500).json({
-      success: false,
       message:
         "Ocurrió un error en el servidor. Por favor, inténtalo más tarde.",
     });
