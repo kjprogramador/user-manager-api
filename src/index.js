@@ -17,7 +17,7 @@ sequelize
   );
 
 // Definir las rutas
-app.use("/api/v1/users", userRoutes);
+app.use("/api/v1", userRoutes);
 
 // Iniciar el servidor
 // Solo iniciar el servidor si no es entorno de prueba

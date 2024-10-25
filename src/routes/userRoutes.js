@@ -10,19 +10,20 @@ import {
 import { validateToken } from "../middlewares/auth.js"; // Importas el middleware de autenticación
 import { validateRole } from "../middlewares/role.js";
 import { loginUser } from "../controllers/authController.js";
+import { registerUser } from "../controllers/registerController.js";
 
 const router = express.Router();
 
 // Rutas CRUD
 // Obtener todos los usuarios
-router.get("/", validateToken, validateRole("admin"), getUsers);
+router.get("/users", validateToken, validateRole("admin"), getUsers);
 
 // Obtener un usuario por ID
-router.get("/:id", getUserById);
+router.get("/users/:id", getUserById);
 
 // Ruta para crear usuario (POST) con validaciones
 router.post(
-  "/",
+  "/users",
   [
     body("name").trim().not().isEmpty().withMessage("El nombre es obligatorio"),
     body("email").isEmail().withMessage("Agrega un email válido"),
@@ -37,7 +38,7 @@ router.post(
 
 // Actualizar usuario
 router.put(
-  "/:id",
+  "/users/:id",
   [
     body("name")
       .optional()
@@ -60,7 +61,7 @@ router.put(
 );
 
 // Eliminar un usuario
-router.delete("/:id", deleteUser);
+router.delete("/users/:id", deleteUser);
 
 // Ruta para login de usuario (POST /login)
 router.post(
@@ -73,6 +74,18 @@ router.post(
       .withMessage("El password es obligatorio"),
   ],
   loginUser
+);
+
+router.post(
+  "/register",
+  [
+    body("name").trim().not().isEmpty().withMessage("El nombre es obligatorio"),
+    body("email").isEmail().withMessage("Agrega un email válido"),
+    body("password")
+      .isLength({ min: 6 })
+      .withMessage("El password debe tener al menos 6 caracteres"),
+  ],
+  registerUser
 );
 
 export default router;

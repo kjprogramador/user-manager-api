@@ -12,17 +12,12 @@ export const getUsers = async (req, res) => {
     const result = await getPaginatedUsers(page, limit, role);
 
     if (!result.data.length === 0) {
-      // ojo aca que sucess ya no existe <<<<<<<<<<<<<<<<<<---------------
       return res.status(404).json(result);
     }
 
     res.status(200).json(result);
   } catch (error) {
     console.error(error);
-    // res.status(500).json({
-    //   error: true,
-    //   message: "Error en el servidor. Inténtalo más tarde.",
-    // });
     res.status(500).json({
       message:
         "Ocurrió un error en el servidor. Por favor, inténtalo más tarde.",
