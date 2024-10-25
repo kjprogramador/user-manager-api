@@ -1,5 +1,5 @@
 import { Sequelize } from "sequelize";
-import { dbConfig } from "../config/db.js";
+import { dbConfig } from "../../config/db.js";
 import UserModel from "./userModel.js";
 
 let sequelize;

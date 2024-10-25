@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js",
+    "start": "node src/index.js",
     "test": "cross-env NODE_ENV=test jest --detectOpenHandles"
   },
   "author": "Kevin Leon",

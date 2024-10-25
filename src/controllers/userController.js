@@ -1,29 +1,46 @@
 import { validationResult } from "express-validator";
 import { User } from "../models/index.js";
+import { getPaginatedUsers } from "../services/userService.js";
 import bcrypt from "bcryptjs";
 
 // Obtener todos los usuarios
 export const getUsers = async (req, res) => {
   try {
-    const usuarios = await User.findAll();
+    const { page = 1, limit = 10 } = req.query;
 
-    if (usuarios.length === 0) {
-      return res.status(404).json({
-        error: true,
-        message: "No se encontraron usuarios",
-      });
+    // Llamar al servicio para obtener los usuarios paginados
+    const result = await getPaginatedUsers(page, limit);
+
+    if (!result.success) {
+      return res.status(404).json(result);
     }
 
-    res.json({
-      error: false,
-      message: "Usuarios obtenidos exitosamente",
-      usuarios,
-    });
+    res.status(200).json(result);
+
+    // const usuarios = await User.findAll();
+
+    // if (usuarios.length === 0) {
+    //   return res.status(404).json({
+    //     error: true,
+    //     message: "No se encontraron usuarios",
+    //   });
+    // }
+
+    // res.json({
+    //   error: false,
+    //   message: "Usuarios obtenidos exitosamente",
+    //   usuarios,
+    // });
   } catch (error) {
     console.error(error);
+    // res.status(500).json({
+    //   error: true,
+    //   message: "Error en el servidor. Inténtalo más tarde.",
+    // });
     res.status(500).json({
-      error: true,
-      message: "Error en el servidor. Inténtalo más tarde.",
+      success: false,
+      message:
+        "Ocurrió un error en el servidor. Por favor, inténtalo más tarde.",
     });
   }
 };
